@@ -11,16 +11,15 @@
             padding: 0;
         }
         
-        body {
+        html, body {
             font-family: Arial, sans-serif;
             background-color: #222;
             color: #fff;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            height: 100%;
             width: 100%;
             overflow: hidden;
-            position: fixed;
         }
         
         #chat-container {
@@ -30,7 +29,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: relative;
         }
         
         #chat-messages {
@@ -39,7 +37,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            -webkit-overflow-scrolling: touch; /* Cho iOS mượt hơn */
+            -webkit-overflow-scrolling: touch;
         }
         
         .message {
@@ -71,8 +69,7 @@
             border-top: 1px solid #555;
             padding: 10px;
             background-color: #333;
-            position: sticky;
-            bottom: 0;
+            width: 100%;
         }
         
         #user-input {
@@ -84,6 +81,8 @@
             font-size: 16px;
             background-color: #444;
             color: white;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         button {
@@ -96,6 +95,8 @@
             cursor: pointer;
             font-size: 16px;
             min-width: 60px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         button:hover {
@@ -139,27 +140,13 @@
             
             #user-input {
                 padding: 8px 12px;
-                font-size: 14px;
+                font-size: 16px; /* Giữ cỡ chữ 16px để tránh zoom trên iOS */
             }
             
             button {
-                padding: 0 10px;
+                padding: 8px 10px;
                 font-size: 14px;
                 min-width: 50px;
-            }
-        }
-        
-        /* Tránh zoom khi nhập liệu trên iOS */
-        @media screen and (-webkit-min-device-pixel-ratio:0) { 
-            #user-input {
-                font-size: 16px;
-            }
-        }
-        
-        /* Khắc phục lỗi trên iOS khi bàn phím xuất hiện */
-        @supports (-webkit-touch-callout: none) {
-            #chat-container {
-                height: -webkit-fill-available;
             }
         }
     </style>
@@ -168,33 +155,28 @@
     <div id="chat-container">
         <div id="chat-messages"></div>
         <form id="input-form">
-            <input type="text" id="user-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+            <input type="text" id="user-input" placeholder="Nhập tin nhắn..." autocomplete="off" inputmode="text">
             <button type="submit">Gửi</button>
         </form>
     </div>
     <script>
-        document.getElementById('input-form').addEventListener('submit', async function(e) {
+        // Xử lý khi người dùng gửi tin nhắn
+        document.getElementById('input-form').addEventListener('submit', function(e) {
             e.preventDefault();
+            sendMessage();
+        });
+        
+        // Hàm xử lý gửi tin nhắn
+        function sendMessage() {
             const userInput = document.getElementById('user-input');
             const message = userInput.value.trim();
             if (!message) return;
             
             addMessage('user', message);
             userInput.value = '';
-            userInput.focus();
             
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-                
-                const data = await response.json();
-                addMessage('bot', data.reply);
-            } catch (error) {
-                console.error('Lỗi:', error);
-                // Để test giao diện khi không có backend
+            // Mô phỏng phản hồi từ bot (vì không có backend thực)
+            setTimeout(function() {
                 const botResponses = [
                     "Xin chào! Tôi có thể giúp gì cho bạn?",
                     "Cảm ơn bạn đã liên hệ. Đây là tin nhắn test.",
@@ -203,9 +185,27 @@
                 ];
                 const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
                 addMessage('bot', randomResponse);
-            }
-        });
+            }, 1000);
+            
+            // Nếu có backend thực, bạn có thể mở comment phần code dưới đây:
+            /*
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage('bot', data.reply);
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                addMessage('bot', 'Có lỗi xảy ra. Vui lòng thử lại sau.');
+            });
+            */
+        }
         
+        // Thêm tin nhắn vào khung chat
         function addMessage(sender, message) {
             const chatMessages = document.getElementById('chat-messages');
             const messageElement = document.createElement('div');
@@ -215,18 +215,29 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        // Đảm bảo input luôn nhận focus khi nhấn vào nó
+        document.getElementById('user-input').addEventListener('click', function() {
+            this.focus();
+        });
+
         // Khởi tạo với tin nhắn chào mừng
         window.onload = function() {
             setTimeout(function() {
                 addMessage('bot', 'Xin chào! Tôi là Valen. Bạn cần giúp gì không?');
             }, 500);
+            
+            // Đặt focus vào input sau khi trang tải xong (có thể không hoạt động trên một số thiết bị di động)
+            document.getElementById('user-input').focus();
         };
-
-        // Khắc phục vấn đề khi bàn phím di động hiển thị
-        const viewport = document.querySelector('meta[name=viewport]');
-        window.addEventListener('resize', () => {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        
+        // Xử lý để bàn phím xuất hiện khi nhấn vào input
+        document.getElementById('user-input').addEventListener('touchstart', function(e) {
+            this.focus();
+        });
+        
+        // Sử dụng nút gửi làm nút kích hoạt bàn phím
+        document.querySelector('button').addEventListener('touchstart', function() {
+            document.getElementById('user-input').focus();
         });
     </script>
 </body>
