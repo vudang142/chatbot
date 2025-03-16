@@ -4,40 +4,78 @@
     <title>Chatbot Đơn Giản</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
         #chat-container {
-            width: 400px;
-            height: 500px;
-            border: 1px solid #ccc;
-            margin: 0 auto;
-            padding: 10px;
+            width: 100vw;
+            height: 100vh;
+            background-color: #333;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         #chat-messages {
             flex: 1;
+            padding: 20px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 75%;
+            padding: 15px;
+            border-radius: 15px;
             margin-bottom: 10px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            display: inline-block;
         }
         .user-message {
-            background-color: #dcf8c6;
-            margin: 5px;
-            padding: 8px;
-            border-radius: 10px;
+            background-color: #0b93f6;
             align-self: flex-end;
+            color: white;
         }
         .bot-message {
-            background-color: #f1f0f0;
-            margin: 5px;
-            padding: 8px;
-            border-radius: 10px;
+            background-color: #444;
             align-self: flex-start;
+            color: white;
         }
         #input-form {
             display: flex;
+            border-top: 1px solid #555;
+            padding: 15px;
+            background-color: #333;
         }
         #user-input {
             flex: 1;
-            padding: 8px;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            outline: none;
+            font-size: 18px;
+            background-color: #444;
+            color: white;
+        }
+        button {
+            margin-left: 15px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 30px;
+            background-color: #0b93f6;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        button:hover {
+            background-color: #007bff;
         }
     </style>
 </head>
