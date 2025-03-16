@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Valen</title>
-    <link rel="icon" type="image/png" href="favicon.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,22 +94,17 @@
             const message = userInput.value;
             if (!message) return;
             
-            // Hiển thị tin nhắn người dùng
             addMessage('user', message);
             userInput.value = '';
             
-            // Gửi yêu cầu đến backend
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message })
                 });
                 
                 const data = await response.json();
-                // Hiển thị phản hồi từ chatbot
                 addMessage('bot', data.reply);
             } catch (error) {
                 console.error('Lỗi:', error);
@@ -121,7 +115,7 @@
         function addMessage(sender, message) {
             const chatMessages = document.getElementById('chat-messages');
             const messageElement = document.createElement('div');
-            messageElement.className = sender === 'user' ? 'user-message' : 'bot-message';
+            messageElement.className = `message ${sender}-message`;
             messageElement.textContent = message;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
