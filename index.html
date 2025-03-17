@@ -3,7 +3,6 @@
 <head>
     <title>Valen</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,13 +13,10 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            position: fixed;
         }
         #chat-container {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background-color: #333;
             display: flex;
             flex-direction: column;
@@ -46,13 +42,11 @@
             background-color: #0b93f6;
             align-self: flex-end;
             color: white;
-            border-bottom-right-radius: 5px;
         }
         .bot-message {
             background-color: #444;
             align-self: flex-start;
             color: white;
-            border-bottom-left-radius: 5px;
         }
         #input-form {
             display: flex;
@@ -83,34 +77,6 @@
         button:hover {
             background-color: #007bff;
         }
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            align-self: flex-start;
-            background-color: #444;
-            padding: 12px 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-        }
-        .typing-indicator span {
-            height: 8px;
-            width: 8px;
-            margin: 0 2px;
-            background-color: #ccc;
-            border-radius: 50%;
-            display: inline-block;
-            animation: bounce 1.5s infinite ease-in-out;
-        }
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
     </style>
 </head>
 <body>
@@ -122,68 +88,30 @@
         </form>
     </div>
     <script>
-        // Biến để theo dõi indicator đang hiển thị
-        let typingIndicator = null;
-        
-        // Hiển thị typing indicator
-        function showTypingIndicator() {
-            const chatMessages = document.getElementById('chat-messages');
-            
-            // Tạo indicator nếu chưa tồn tại
-            if (!typingIndicator) {
-                typingIndicator = document.createElement('div');
-                typingIndicator.className = 'typing-indicator';
-                typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-                chatMessages.appendChild(typingIndicator);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-        
-        // Ẩn typing indicator
-        function hideTypingIndicator() {
-            if (typingIndicator && typingIndicator.parentNode) {
-                typingIndicator.parentNode.removeChild(typingIndicator);
-                typingIndicator = null;
-            }
-        }
-        
         document.getElementById('input-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const userInput = document.getElementById('user-input');
-            const message = userInput.value.trim();
+            const message = userInput.value;
             if (!message) return;
-            
-            // Hiển thị tin nhắn người dùng
+
             addMessage('user', message);
             userInput.value = '';
-            
-            // Hiển thị typing indicator
-            showTypingIndicator();
-            
+
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message })
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+
                 const data = await response.json();
-                
-                // Ẩn typing indicator và hiển thị phản hồi
-                hideTypingIndicator();
                 addMessage('bot', data.reply);
-                
             } catch (error) {
                 console.error('Lỗi:', error);
-                hideTypingIndicator();
                 addMessage('bot', 'Có lỗi xảy ra. Vui lòng thử lại sau.');
             }
         });
-        
+
         function addMessage(sender, message) {
             const chatMessages = document.getElementById('chat-messages');
             const messageElement = document.createElement('div');
@@ -192,35 +120,6 @@
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        
-        // Thêm tin nhắn chào mừng khi trang tải xong
-        window.onload = function() {
-            setTimeout(function() {
-                addMessage('bot', 'Xin chào! Tôi là Valen, trợ lý AI được hỗ trợ bởi ChatGPT. Bạn cần giúp gì không?');
-            }, 500);
-        };
     </script>
 </body>
 </html>
-</antArtifact
-
-<antArtifact identifier="package-json" type="application/vnd.ant.code" language="json" title="File package.json">
-{
-  "name": "valen-chatbot",
-  "version": "1.0.0",
-  "description": "Ứng dụng chat sử dụng API OpenAI",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "axios": "^1.6.2",
-    "body-parser": "^1.20.2",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  }
-}
