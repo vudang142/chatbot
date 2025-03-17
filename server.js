@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const axios = require('axios');
-require('dotenv').config();
+require('dotenv').config(); // Để hỗ trợ khi cần thêm .env trong tương lai, tuy nhiên không cần thiết với Render nếu đã cấu hình biến môi trường trên Render.
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +17,17 @@ app.post('/chat', async (req, res) => {
     try {
         const userMessage = req.body.message;
         
+        // Lấy API key từ biến môi trường của Render
+        const apiKey = process.env.OPENAI_API_KEY;
+        
+        // Kiểm tra nếu API key không tồn tại
+        if (!apiKey) {
+            return res.status(500).json({
+                error: 'API key is missing!',
+                details: 'Please make sure OPENAI_API_KEY is set in environment variables on Render.'
+            });
+        }
+
         // Gọi API của OpenAI
         const response = await axios.post(
             'https://api.openai.com/v1/chat/completions',
@@ -31,7 +42,7 @@ app.post('/chat', async (req, res) => {
             },
             {
                 headers: {
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                    'Authorization': `Bearer ${apiKey}`, // Sử dụng API key từ biến môi trường
                     'Content-Type': 'application/json'
                 }
             }
@@ -46,7 +57,7 @@ app.post('/chat', async (req, res) => {
         console.error('Error calling OpenAI:', error.response?.data || error.message);
         res.status(500).json({ 
             error: 'Có lỗi khi gọi API.',
-            details: error.message 
+            details: error.message || 'Unknown error'
         });
     }
 });
